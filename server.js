@@ -11,6 +11,7 @@ import userRouter from "./routes/user.routes.js";
 import orgRoutes from "./routes/org.routes.js";
 import leaveTypeRoutes from "./routes/LeaveType.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
+import subDepartmentRoutes from "./routes/subDepartments.routes.js";
 
 dotenv.config();
 
@@ -31,7 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRouter);
 app.use("/api/leavetypes", leaveTypeRoutes);
 app.use("/api/department", departmentRoutes);
-
+app.use("/api/subdepartments", subDepartmentRoutes);
 // Catch-all route
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
