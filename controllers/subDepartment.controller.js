@@ -1,22 +1,61 @@
 import SubDepartment from "../models/SubDepartment.js";
-import Department from "../models/Department.js";
 
-// Similar CRUD operations
+// Create SubDepartment
 export const createSubDepartment = async (req, res) => {
-    try {
-        const { name, department } = req.body;
-        if (!name || !department) return res.status(400).json({ message: "Name and department are required." });
+  const { name, departmentId } = req.body;
 
-        const deptExists = await Department.findById(department);
-        if (!deptExists) return res.status(404).json({ message: "Department not found." });
+  if (!name || !departmentId) {
+    return res.status(400).json({ message: "Name and department are required." });
+  }
 
-        const subDept = new SubDepartment({ name, department });
-        const savedSubDept = await subDept.save();
-        await savedSubDept.populate("department", "name");
-        res.status(201).json(savedSubDept);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const subdepartment = new SubDepartment({ name, departmentId });
+    const saved = await subdepartment.save();
+    res.status(201).json(saved);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Add get, update, delete as needed similarly
+// Get all subdepartments
+export const getSubDepartments = async (req, res) => {
+  try {
+    const subdepartments = await SubDepartment.find();
+    res.json(subdepartments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get subdepartments by department
+export const getSubDepartmentsByDepartment = async (req, res) => {
+  try {
+    const { departmentId } = req.params;
+    const subdepartments = await SubDepartment.find({ departmentId });
+    res.json(subdepartments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update subdepartment by ID
+export const updateSubDepartment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await SubDepartment.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete subdepartment by ID
+export const deleteSubDepartment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await SubDepartment.findByIdAndDelete(id);
+    res.json({ message: "Subdepartment deleted successfully." });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

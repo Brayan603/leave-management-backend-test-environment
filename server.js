@@ -9,9 +9,11 @@ import morgan from "morgan";
 import authRoutes from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import orgRoutes from "./routes/org.routes.js";
-import leaveTypeRoutes from "./routes/LeaveType.routes.js";
+import leaveRoutes from "./routes/leave.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
 import subDepartmentRoutes from "./routes/subDepartments.routes.js";
+import leaveBalanceRoutes from "./routes/leaveBalance.routes.js";
+import leavesRoutes from "./routes/leaves.routes.js";
 
 dotenv.config();
 
@@ -30,15 +32,18 @@ app.get("/", (req, res) => {
 app.use("/api/organizations", orgRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRouter);
-app.use("/api/leavetypes", leaveTypeRoutes);
+app.use("/api/leave", leaveRoutes);
 app.use("/api/department", departmentRoutes);
 app.use("/api/subdepartments", subDepartmentRoutes);
+app.use("/api/leave-balances", leaveBalanceRoutes);
+app.use("/api/leaves", leavesRoutes);
+
 // Catch-all route
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// ✅ START SERVER ONLY AFTER DB CONNECTS
+// ✅ START SERVER ONLY AFTER DB CONNECTS    //netstat -ano | findstr :5000   //taskkill /PID 12345 /F
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -54,3 +59,8 @@ const startServer = async () => {
 };
 
 startServer();
+
+// # Windows PowerShell
+// tasklist /FI "IMAGENAME eq node.exe"
+// # Replace <PID> with the number from tasklist
+// taskkill /PID <PID> /F
