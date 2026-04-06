@@ -1,36 +1,55 @@
 import Entitlement from "../models/Entitlement.js";
 
-// ✅ Create Entitlement (Admin)
+// ✅ Create Entitlement (Admin) - SUPPORTS MULTIPLE OR SINGLE
 export const createEntitlement = async (req, res) => {
   try {
-    const { userId, leaveTypeId, totalDays } = req.body;
+    const { userId, leaveTypeId, leaveTypeIds, totalDays } = req.body;
 
-    if (!userId || !leaveTypeId || !totalDays) {
-      return res.status(400).json({ message: "All fields are required" });
+    // 🔥 Allow BOTH single or multiple
+    const types = leaveTypeIds?.length
+      ? leaveTypeIds
+      : leaveTypeId
+      ? [leaveTypeId]
+      : [];
+
+    if (!userId || types.length === 0) {
+      return res.status(400).json({
+        message: "userId and at least one leave type are required",
+      });
     }
 
-    // Prevent duplicate entitlement
-    const exists = await Entitlement.findOne({
-      user: userId,
-      leaveType: leaveTypeId,
-    });
+    const created = [];
 
-    if (exists) {
-      return res.status(400).json({ message: "Entitlement already exists" });
+    for (const typeId of types) {
+      // Prevent duplicate entitlement
+      const exists = await Entitlement.findOne({
+        user: userId,
+        leaveType: typeId,
+      });
+
+      if (!exists) {
+        const entitlement = await Entitlement.create({
+          user: userId,
+          leaveType: typeId,
+          totalDays: totalDays || 20, // default if not provided
+          usedDays: 0,
+        });
+
+        created.push(entitlement);
+      }
     }
 
-    const entitlement = await Entitlement.create({
-      user: userId,
-      leaveType: leaveTypeId,
-      totalDays,
+    return res.status(201).json({
+      message: "Entitlements created successfully",
+      data: created,
     });
-
-    res.status(201).json(entitlement);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 // ✅ Get all entitlements
 export const getAllEntitlements = async (req, res) => {
@@ -44,6 +63,8 @@ export const getAllEntitlements = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
 
 // ✅ Get user entitlements
 export const getUserEntitlements = async (req, res) => {
@@ -59,10 +80,13 @@ export const getUserEntitlements = async (req, res) => {
   }
 };
 
+
+
 // ✅ Update entitlement
 export const updateEntitlement = async (req, res) => {
   try {
     const { id } = req.params;
+
     const updated = await Entitlement.findByIdAndUpdate(id, req.body, {
       new: true,
     });
@@ -73,11 +97,15 @@ export const updateEntitlement = async (req, res) => {
   }
 };
 
+
+
 // ✅ Delete entitlement
 export const deleteEntitlement = async (req, res) => {
   try {
     const { id } = req.params;
+
     await Entitlement.findByIdAndDelete(id);
+
     res.json({ message: "Entitlement deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
