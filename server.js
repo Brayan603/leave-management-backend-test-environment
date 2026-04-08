@@ -13,6 +13,7 @@ import departmentRoutes from "./routes/department.routes.js";
 import subDepartmentRoutes from "./routes/subDepartments.routes.js";
 import leaveBalanceRoutes from "./routes/leaveBalance.routes.js";
 import entitlementRoutes from "./routes/entitlement.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use("/api/department", departmentRoutes);
 app.use("/api/subdepartments", subDepartmentRoutes);
 app.use("/api/leave-balances", leaveBalanceRoutes);
 app.use("/api/entitlements", entitlementRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Catch-all route
 app.use((req, res) => {
